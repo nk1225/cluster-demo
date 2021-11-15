@@ -1,0 +1,34 @@
+SHELL = /bin/sh
+
+# System-specific settings
+
+CC =		icpc
+CCFLAGS =	-qopenmp -qopenmp-simd -std=c++11 -O3 -m64 -msse4 -march=native -fp-model precise -liomp5 -I/usr/local/include/boost_1_75_0/ -I/usr/local/include/boost_1_75_0/boost/ -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+NOALIAS =	-fno-strict-aliasing
+DEPFLAGS =	-M
+LINK =		icpc
+LINKFLAGS =	-qopenmp -qopenmp-simd -std=c++11 -O3 -m64 -msse4 -march=native -fp-model precise -fvisibility=hidden -liomp5 -headerpad_max_install_names
+USRLIB =	
+SYSLIB = 
+SIZE =		size
+# Link rule
+
+$(EXE):	$(OBJ)
+	$(LINK) $(LINKFLAGS) $(OBJ) $(USRLIB) $(SYSLIB) -o $(EXE)
+	$(SIZE) $(EXE)
+
+# Compilation rules
+
+%.o:%.cpp
+	$(CC) $(CCFLAGS) -c $<
+
+%.d:%.cpp
+	$(CC) $(CCFLAGS) $(DEPFLAGS) $< > $@
+
+# explicit overrides for files that violate ansi aliasing rules
+
+# Individual dependencies
+
+DEPENDS = $(OBJ:.o=.d)
+include $(DEPENDS)
+
